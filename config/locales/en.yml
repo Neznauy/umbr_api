@@ -1,3 +1,4 @@
 en:
   errors:
     ip?: 'invalid ip address'
+    post_exist?: 'post does not exist'
