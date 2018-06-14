@@ -17,7 +17,7 @@ RSpec.describe CreateRatingService do
     end
 
     context 'when valid params and post with rating' do
-      let!(:post) { create :post }
+      let!(:post) { create :post, avg_rating: 5, rating_quantity: 2 }
       let!(:first_rating) { create :rating, post_id: post.id, rating_value: 5 }
       let!(:second_rating) { create :rating, post_id: post.id, rating_value: 5 }
       let(:params) { {post_id: post.id, rating_value: 2} }

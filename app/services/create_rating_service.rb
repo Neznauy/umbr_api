@@ -15,9 +15,10 @@ class CreateRatingService
 
     if errors.blank?
       ActiveRecord::Base.transaction do 
-        Post.lock.find(params[:post_id])
+        post = Post.lock.find(params[:post_id])
         Rating.create(params)
-        @avg_rating = {avg_rating: Rating.where(post_id: params[:post_id]).average(:rating_value)}
+        post.update(avg_rating: post.new_avg_rating(params[:rating_value]), rating_quantity: post.rating_quantity+1)
+        @avg_rating = {avg_rating: post.avg_rating}
       end
     end
   end

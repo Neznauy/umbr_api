@@ -53,7 +53,7 @@ RSpec.describe PostsController, type: :controller do
 
         parsed_response = JSON.parse(response.body).with_indifferent_access
         expect(parsed_response).to include(
-          avg_rating: "5.0"
+          avg_rating: 5.0
         )
       end
     end
@@ -70,6 +70,40 @@ RSpec.describe PostsController, type: :controller do
         parsed_response = JSON.parse(response.body).with_indifferent_access
         expect(parsed_response).to include(
           post_id: ["is missing", "post does not exist"]
+        )
+      end
+    end
+  end
+
+  describe '#get_top_posts' do
+    context "when valid params" do
+      let!(:first_post) { create :post, avg_rating: 1 }
+      let!(:second_post) { create :post, avg_rating: 2 }
+      let!(:third_post) { create :post, avg_rating: 3 }
+
+      it do
+        post :get_top_posts, params: { quantity: 2 }
+
+        expect(response).to have_http_status(200)
+        expect(response.content_type).to eq("application/json")
+
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.count).to eq 2
+        expect(parsed_response.first['id']).to eq third_post.id
+        expect(parsed_response.last['id']).to eq second_post.id
+      end
+    end
+
+    context "when missed params" do
+      it do
+        post :get_top_posts, params: {}
+
+        expect(response).to have_http_status(422)
+        expect(response.content_type).to eq("application/json")
+
+        parsed_response = JSON.parse(response.body).with_indifferent_access
+        expect(parsed_response).to include(
+          quantity: ["is missing", "must be greater than 0"]
         )
       end
     end

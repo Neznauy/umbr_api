@@ -22,6 +22,14 @@ class PostsController < ApplicationController
   end
 
   def get_top_posts
+    service = GetTopPostsService.new(params)
+    service.call
+
+    if service.errors.blank?
+      render json: service.posts, status: 200
+    else
+      render json: service.errors, status: 422
+    end
   end
 
   def get_ip_list
