@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 5) do
+ActiveRecord::Schema.define(version: 6) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,6 +32,8 @@ ActiveRecord::Schema.define(version: 5) do
     t.datetime "updated_at", null: false
     t.float "avg_rating", default: 0.0
     t.integer "rating_quantity", default: 0
+    t.index ["author_ip"], name: "index_posts_on_author_ip"
+    t.index ["avg_rating"], name: "index_posts_on_avg_rating"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -47,6 +49,7 @@ ActiveRecord::Schema.define(version: 5) do
     t.text "login", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["login"], name: "index_users_on_login", unique: true
   end
 
   add_foreign_key "posts", "users"
