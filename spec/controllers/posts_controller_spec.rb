@@ -108,4 +108,26 @@ RSpec.describe PostsController, type: :controller do
       end
     end
   end
+
+  describe '#get_ip_list' do
+    before do
+      2.times do |i|
+        params = {
+          post: {title: 'title1', content: 'content1', author_ip: '192.168.0.1'},
+          user: {login: "user#{i}"}
+        }
+        CreatePostService.new(ActionController::Parameters.new(params)).call
+      end
+    end
+
+    it do
+      get :get_ip_list
+
+      expect(response).to have_http_status(200)
+      expect(response.content_type).to eq("application/json")
+
+      parsed_response = JSON.parse(response.body)
+      expect(parsed_response['192.168.0.1']).to include("user0", "user1")
+    end
+  end
 end

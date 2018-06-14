@@ -10,10 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 4) do
+ActiveRecord::Schema.define(version: 5) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "denormalization_ips", force: :cascade do |t|
+    t.text "ip", null: false
+    t.text "logins", default: [], array: true
+    t.integer "logins_quantity", default: 0
+    t.index ["ip"], name: "index_denormalization_ips_on_ip", unique: true
+    t.index ["logins_quantity"], name: "index_denormalization_ips_on_logins_quantity"
+  end
 
   create_table "posts", force: :cascade do |t|
     t.text "title", null: false

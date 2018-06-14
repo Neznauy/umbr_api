@@ -33,5 +33,9 @@ class PostsController < ApplicationController
   end
 
   def get_ip_list
+    service = GetIpListService.new
+    service.call
+
+    render json: service.ips, status: 200
   end
 end

@@ -19,6 +19,7 @@ class CreatePostService
       ActiveRecord::Base.transaction do 
         user = User.where(login: params[:user][:login]).first_or_create(params[:user])
         @post = user.posts.create(params[:post])
+        post.update_ips(params[:post][:author_ip], params[:user][:login])
       end
     end
   end
