@@ -33,7 +33,7 @@ RSpec.describe CreateRatingService do
 
       it do
         service.call
-        expect(service.errors).to include(post_id: ["is missing", "post does not exist"])
+        expect(service.errors).to include(post_id: ["is missing"])
       end
     end
 
@@ -52,7 +52,7 @@ RSpec.describe CreateRatingService do
 
       it do
         service.call
-        expect(service.errors).to include(rating_value: ["is missing", "must be one of: 1, 2, 3, 4, 5"])
+        expect(service.errors).to include(rating_value: ["is missing"])
         expect(post.reload.ratings.count).to eq 0
       end
     end

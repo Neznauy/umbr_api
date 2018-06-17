@@ -69,7 +69,7 @@ RSpec.describe PostsController, type: :controller do
 
         parsed_response = JSON.parse(response.body).with_indifferent_access
         expect(parsed_response).to include(
-          post_id: ["is missing", "post does not exist"]
+          post_id: ["is missing"]
         )
       end
     end
@@ -103,7 +103,7 @@ RSpec.describe PostsController, type: :controller do
 
         parsed_response = JSON.parse(response.body).with_indifferent_access
         expect(parsed_response).to include(
-          quantity: ["is missing", "must be greater than 0"]
+          quantity: ["is missing"]
         )
       end
     end

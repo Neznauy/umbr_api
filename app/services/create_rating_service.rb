@@ -1,23 +1,19 @@
 class CreateRatingService
   attr_reader :params, :errors, :avg_rating
 
-  PERMITTED_ATTRIBUTES = [
-    :post_id, :rating_value
-  ].freeze
-
   def initialize(params)
-    @params = params.permit(*PERMITTED_ATTRIBUTES).to_h
+    @params = params.to_h
   end
 
   def call
     sanitize_params
-    @errors = schema.call(params).messages
+    @errors = validated_params_errors
 
     if errors.blank?
       ActiveRecord::Base.transaction do 
-        post = Post.lock.find(params[:post_id])
-        Rating.create(params)
-        post.update(avg_rating: post.new_avg_rating(params[:rating_value]), rating_quantity: post.rating_quantity+1)
+        post = Post.lock.find(validated_params_output[:post_id])
+        Rating.create(validated_params_output)
+        post.update(avg_rating: post.new_avg_rating(validated_params_output[:rating_value]), rating_quantity: post.rating_quantity+1)
         @avg_rating = {avg_rating: post.avg_rating}
       end
     end
@@ -25,19 +21,16 @@ class CreateRatingService
 
   private
 
-  def schema
-    Dry::Validation.Schema do
-      configure do
-        config.messages = :i18n
-        
-        def post_exist?(value)
-          Post.find_by(id: value) ? true : false
-        end
-      end
+  def validated_params
+    @validated_params ||= CreateRatingValidator.new(params).call
+  end
 
-      required(:post_id).filled(:int?, :post_exist?)
-      required(:rating_value).filled(included_in?: [1,2,3,4,5])
-    end
+  def validated_params_errors
+    validated_params.errors
+  end
+
+  def validated_params_output
+    validated_params.output
   end
 
   def sanitize_params

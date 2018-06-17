@@ -1,13 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe CreatePostService do
-  let(:service) do
-    described_class.new(ActionController::Parameters.new(params))
+RSpec.describe CreatePostValidator do
+  let(:validator) do
+    described_class.new(params).call
   end
 
   describe '#call' do
-    before { service.call }
-    
     context 'when valid params' do
       let(:params) do
         {
@@ -17,11 +15,23 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.post.title).to eq 'title1'
-        expect(service.post.content).to eq 'content1'
-        expect(service.post.author_ip).to eq '192.168.0.1'
+        expect(validator.output).to eq params
+        expect(validator.errors).to eq({})
+      end
+    end
 
-        expect(service.post.user.login).to eq 'user1'
+    context 'when excess params' do
+      let(:params) do
+        {
+          post: {title: 'title1', content: 'content1', author_ip: '192.168.0.1'},
+          user: {login: 'user1'},
+          excess: {excess: true}
+        }
+      end
+
+      it do
+        expect(validator.output).to eq params.without(:excess)
+        expect(validator.errors).to eq({})
       end
     end
 
@@ -34,7 +44,7 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.errors).to include(post: hash_including(title: ["is missing"]))
+        expect(validator.errors).to include(post: hash_including(title: ["is missing"]))
       end
     end
 
@@ -47,7 +57,7 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.errors).to include(post: hash_including(content: ["is missing"]))
+        expect(validator.errors).to include(post: hash_including(content: ["is missing"]))
       end
     end
 
@@ -60,7 +70,7 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.errors).to include(post: hash_including(author_ip: ["is missing"]))
+        expect(validator.errors).to include(post: hash_including(author_ip: ["is missing"]))
       end
     end
 
@@ -73,7 +83,7 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.errors).to include(post: hash_including(author_ip: ["invalid ip address"]))
+        expect(validator.errors).to include(post: hash_including(author_ip: ["invalid ip address"]))
       end
     end
 
@@ -86,7 +96,7 @@ RSpec.describe CreatePostService do
       end
 
       it do
-        expect(service.errors).to include(user: hash_including(login: ["is missing"]))
+        expect(validator.errors).to include(user: hash_including(login: ["is missing"]))
       end
     end
   end

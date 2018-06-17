@@ -22,7 +22,7 @@ RSpec.describe GetTopPostsService do
 
       it do
         service.call
-        expect(service.errors).to include(quantity: ["is missing", "must be greater than 0"])
+        expect(service.errors).to include(quantity: ["is missing"])
       end
     end
 
