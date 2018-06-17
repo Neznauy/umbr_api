@@ -7,11 +7,14 @@ class Post < ApplicationRecord
   end
 
   def update_ips(ip, login)
-    ActiveRecord::Base.connection.execute(
-      "INSERT INTO denormalization_ips(ip, logins) VALUES ('#{ip}', ARRAY['#{login}'])
+    sql_arr = [
+      "INSERT INTO denormalization_ips(ip, logins) VALUES (?, ARRAY[?])
       ON CONFLICT (ip) DO UPDATE
-        SET logins = array_undup(array_cat(denormalization_ips.logins, ARRAY['#{login}']));
-      UPDATE denormalization_ips SET logins_quantity = array_length(logins, 1) WHERE ip='#{ip}';"
-    )
+        SET logins = array_undup(array_cat(denormalization_ips.logins, ARRAY[?]));
+      UPDATE denormalization_ips SET logins_quantity = array_length(logins, 1) WHERE ip = ?;",
+      ip, login, login, ip
+    ]
+    sql = ActiveRecord::Base.sanitize_sql_array(sql_arr)
+    ActiveRecord::Base.connection.execute(sql)
   end
 end
